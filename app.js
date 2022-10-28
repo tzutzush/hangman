@@ -67,7 +67,7 @@ function determineWinnerOrLoser(){
     alert('Leütöttek mint a büdös szart! (Éljen Erdei!)');
     clearBoard();
   } else if (array.join('') === userWordInputText) {
-    alert('Szia uram, Ön nyert!')
+    alert('Zsép volt!')
   }
 }
 
