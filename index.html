@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hangman</title>
+    <link rel="stylesheet" href="app.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div id="start-game-div">
+      <form>
+        <label id="instructions"
+          >Írj be egy szót, amit szeretnél, hogy a játékos kitaláljon!</label
+        ><br />
+        <input type="text" id="user-word-input" /><br />
+      </form>
+      <div id="game">
+        <div id="guess-counter" hidden>Még 8 hibalehetőséged van, utána rotty!</div>
+        <div id="user-input-section"></div>
+        <ul id="list-of-buttons"></ul>
+      </div>
+      <button id="start-game">Akkor GÓ BAZMEG!</button>
+      <button id="clear-board" disabled>
+        Punci vagyok, töröld az egészet a picsába!
+      </button>
+    </div>
+  </body>
+</html>
