@@ -1,16 +1,19 @@
 const startGameButton = document.getElementById("start-game");
 const clearBoardButton = document.getElementById("clear-board");
+const clearBoardAfterWinButton = document.getElementById('clear-board-after-win');
 const listOfButtons = document.getElementById("list-of-buttons");
 const emptySlotsForLetters = document.getElementById("empty-slots-for-letters");
 const alphabetAsText = "aábcdeéfghiíjklmnoóöőpqrstuúüűvwxyz";
 const alphabet = alphabetAsText.split("");
 const userWordInputField = document.getElementById("user-word-input");
-let userWordInputArrayOfLetters;
-let userWordInputText;
+const solutionModal = document.querySelector('.modal');
+const overlay = document.querySelector('.overlay')
 const userInputSection = document.getElementById('user-input-section');
 const form = document.querySelector('form');
 const guessCounter = document.getElementById('guess-counter');
 let numberOfGuessesRemaining = 8;
+let userWordInputArrayOfLetters;
+let userWordInputText;
 
 function game() {
   startGame();
@@ -67,7 +70,8 @@ function determineWinnerOrLoser(){
     alert('Leütöttek mint a büdös szart! (Éljen Erdei!)');
     clearBoard();
   } else if (array.join('') === userWordInputText) {
-    alert('Zsép volt!')
+    solutionModal.querySelector('.solution').textContent = `Nyertél, a helyes megoldás ${userWordInputText} volt.`
+    openModalAndOverlay();
   }
 }
 
@@ -89,5 +93,11 @@ async function getUserInput() {
   }
 }
 
+function openModalAndOverlay() {
+  solutionModal.classList.remove('hidden');
+  overlay.classList.remove('hidden');
+}
+
 startGameButton.addEventListener("click", game);
 clearBoardButton.addEventListener("click", clearBoard);
+clearBoardAfterWinButton.addEventListener('click', clearBoard);
