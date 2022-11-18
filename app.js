@@ -1,103 +1,139 @@
 const startGameButton = document.getElementById("start-game");
 const clearBoardButton = document.getElementById("clear-board");
-const clearBoardAfterWinButton = document.getElementById('clear-board-after-win');
+const clearBoardAfterWinButton = document.getElementById(
+  "clear-board-after-win"
+);
 const listOfButtons = document.getElementById("list-of-buttons");
 const emptySlotsForLetters = document.getElementById("empty-slots-for-letters");
-const alphabetAsText = "aábcdeéfghiíjklmnoóöőpqrstuúüűvwxyz";
-const alphabet = alphabetAsText.split("");
+// prettier-ignore
+const alphabet = ['a', 'á', 'b', 'c', 'd', 'e', 'é', 'f', 'g', 'h', 'i', 'í', 'j', 'k', 'l', 'm', 'n', 'o', 'ó', 'ö', 'ő', 'p', 'q', 'r', 's', 't', 'u', 'ú', 'ü', 'ű', 'v', 'w', 'x', 'y', 'z']
 const userWordInputField = document.getElementById("user-word-input");
-const solutionModal = document.querySelector('.modal');
-const overlay = document.querySelector('.overlay')
-const userInputSection = document.getElementById('user-input-section');
-const form = document.querySelector('form');
-const guessCounter = document.getElementById('guess-counter');
-let numberOfGuessesRemaining = 8;
-let userWordInputArrayOfLetters;
-let userWordInputText;
+const solutionModal = document.querySelector(".modal");
+const overlay = document.querySelector(".overlay");
+const userInputSection = document.getElementById("user-input-section");
+const form = document.querySelector("form");
+const guessCounter = document.getElementById("guess-counter");
 
-function game() {
-  startGame();
-  addEventListenersToButtons();
-}
+class App {
+  numberOfGuessesRemaining = 8;
+  userWordInputArrayOfLetters;
+  userWordInputText;
 
-function clearBoard() {
-  location.reload();
-}
+  constructor() {
+    // set focus
 
-async function startGame() {
-  const result = await getUserInput();
-  if (!result) {
-    return;
-  } else {
+    userWordInputField.focus();
+
+    // start game button
+
+    startGameButton.addEventListener("click", this.getUserInput.bind(this));
+
+    // clear board button
+
+    clearBoardButton.addEventListener("click", this.clearBoard);
+
+    // clear board after win/lose button
+
+    clearBoardAfterWinButton.addEventListener("click", this.clearBoard);
+
+    // Adding event listener to UL
+
+    listOfButtons.addEventListener("click", this.checkButton.bind(this));
+  }
+
+  // Getting user input and creating dashes
+
+  getUserInput() {
+    this.userWordInputText = userWordInputField.value.trim().toLowerCase();
+    if (!this.userWordInputText) {
+      alert("Írjál már be valamit baszod!");
+      return;
+    }
+    userWordInputField.value = "";
+    this.userWordInputArrayOfLetters = this.userWordInputText.split("");
+    this.createDashes(this.userWordInputText);
+    this.createButtons();
+  }
+
+  // create buttons
+
+  createButtons() {
     alphabet.forEach((letter) => {
-      let button = document.createElement("button");
-      button.innerText = letter;
-      listOfButtons.append(button);
+      listOfButtons.insertAdjacentHTML(
+        "beforeend",
+        `<button class = "button letter-button">${letter}</button>`
+      );
     });
     startGameButton.disabled = true;
     clearBoardButton.disabled = false;
     form.hidden = true;
     guessCounter.hidden = false;
   }
-}
 
-function addEventListenersToButtons() {
-  const dashes = document.querySelectorAll('.dashes');
-  listOfButtons.addEventListener("click", (event) => {
+  // chech clicked button against user's input
+
+  checkButton(event) {
+    const dashes = document.querySelectorAll(".dashes");
+    if (!event.target.classList.contains("letter-button")) return;
     event.target.disabled = true;
     const clickedLetter = event.target.innerText;
-    if (userWordInputArrayOfLetters.includes(clickedLetter)) {
-      for (let index = 0; index < userWordInputArrayOfLetters.length; index++) {
-        if(userWordInputArrayOfLetters[index] === clickedLetter) {
+    if (this.userWordInputArrayOfLetters.includes(clickedLetter)) {
+      this.userWordInputArrayOfLetters.forEach((letter, index) => {
+        if (letter === clickedLetter) {
           dashes[index].textContent = `${clickedLetter}`;
         }
-      }
+      });
     } else {
-      numberOfGuessesRemaining--;
-      guessCounter.textContent = `Még ${numberOfGuessesRemaining} hibalehetőséged van, utána rotty!`;
-    };
-    determineWinnerOrLoser();
-  });
-}
-
-function determineWinnerOrLoser(){
-  let array = [];
-  const dashes = document.querySelectorAll('.dashes');
-  for (let index = 0; index < dashes.length; index++) {
-    array.push(dashes[index].textContent);
+      this.numberOfGuessesRemaining--;
+      guessCounter.textContent = `Még ${this.numberOfGuessesRemaining} hibalehetőséged van, utána rotty!`;
+    }
+    this.determineWinnerOrLoser();
   }
-  if(numberOfGuessesRemaining < 1) {
-    alert('Leütöttek mint a büdös szart! (Éljen Erdei!)');
-    clearBoard();
-  } else if (array.join('') === userWordInputText) {
-    solutionModal.querySelector('.solution').textContent = `Nyertél, a helyes megoldás ${userWordInputText} volt.`
-    openModalAndOverlay();
+
+  // Check win-lose condition
+
+  determineWinnerOrLoser() {
+    let array = [];
+    const dashes = document.querySelectorAll(".dashes");
+    dashes.forEach((dash) => array.push(dash.textContent));
+
+    if (this.numberOfGuessesRemaining < 1) {
+      solutionModal.querySelector(
+        ".solution"
+      ).textContent = `Vesztettél, a helyes megoldás ${this.userWordInputText} volt.`;
+      solutionModal.querySelector(
+        "h1"
+      ).textContent = `Leütöttek mint a büdös szart! Éljen Erdei!`;
+      this.openModalAndOverlay();
+    }
+
+    if (array.join("") === this.userWordInputText) {
+      solutionModal.querySelector(
+        ".solution"
+      ).textContent = `Nyertél, a helyes megoldás ${this.userWordInputText} volt.`;
+      this.openModalAndOverlay();
+    }
+  }
+
+  // create dashes
+
+  createDashes(userInput) {
+    let displayItem = userInput.replace(/./g, '<span class="dashes">_</span>');
+    userInputSection.innerHTML = displayItem;
+  }
+
+  // Open modal and overlay
+
+  openModalAndOverlay() {
+    solutionModal.classList.remove("hidden");
+    overlay.classList.remove("hidden");
+  }
+
+  // clear board
+
+  clearBoard() {
+    location.reload();
   }
 }
 
-function createDashes(userInput) {
-  let displayItem = userInput.replace(/./g, '<span class="dashes">_</span>');
-  userInputSection.innerHTML = displayItem;
-}
-
-async function getUserInput() {
-  userWordInputText = userWordInputField.value.trim().toLowerCase();
-  if (userWordInputText === "") {
-    alert("Írjál már be valamit baszod!");
-    return;
-  } else {
-    userWordInputField.value = '';
-    userWordInputArrayOfLetters = userWordInputText.split("");
-    createDashes(userWordInputText);
-    return userWordInputArrayOfLetters;
-  }
-}
-
-function openModalAndOverlay() {
-  solutionModal.classList.remove('hidden');
-  overlay.classList.remove('hidden');
-}
-
-startGameButton.addEventListener("click", game);
-clearBoardButton.addEventListener("click", clearBoard);
-clearBoardAfterWinButton.addEventListener('click', clearBoard);
+const app = new App();
